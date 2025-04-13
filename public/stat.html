@@ -482,9 +482,8 @@
     }
 
     function fetchPlayerData() {
-      fetch('https://statbmln-z2-vy.vercel.app/stat.html', {
+      fetch('https://statbmln-z2-vy.vercel.app/api/data', {
         method: "GET",
-        mode: "cors",
         headers: {
           "Accept": "application/json"
         }
@@ -497,11 +496,13 @@
         })
         .then(data => {
           console.log('Получены данные:', data);
-          playerData = data;
+          playerData = Array.isArray(data) ? data : [];
           initializePlayers();
         })
         .catch(error => {
           console.error('Error fetching player data:', error);
+          playerData = [];
+          initializePlayers();
         });
     }
 
