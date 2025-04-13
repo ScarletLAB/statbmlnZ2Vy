@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scarlet Analytics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #D74356, #AC3645);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: white;
+      overflow-x: hidden;
+      padding-top: 60px;
+      position: relative;
+    }
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .gray-background {
+      background-color: #333;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+      padding: 40px 0;
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 200px);
+      margin-bottom: 0;
+      flex-grow: 1;
+    }
+    .gray-background::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.05) 26%, transparent 27%),
+        linear-gradient(90deg, transparent 24%, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.05) 26%, transparent 27%);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .hamburger {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 35px;
+      height: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .hamburger div {
+      height: 5px;
+      background-color: white;
+      border-radius: 5px;
+      transition: 0.3s ease;
+    }
+    /* NavBar */
+    nav {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      height: 100vh;
+      width: 250px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      z-index: 4;
+      padding-top: 80px;
+    }
+    nav.open {
+      left: 0;
+    }
+    nav a {
+      display: block;
+      padding: 15px 30px;
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: background-color 0.3s;
+    }
+    nav a:hover {
+      background-color: #D74356;
+    }
+    nav a:focus, .hamburger:focus {
+      outline: none;
+    }
+    .main {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+      animation: fadeInDown 1s ease-out;
+    }
+    .main h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    .main p {
+      font-size: 1.3rem;
+      opacity: 0.9;
+      letter-spacing: 1px;
+      animation: fadeIn 2s ease-out;
+    }
+    
+    /* Search Box */
+    .search-box {
+      width: 80%;
+      max-width: 800px;
+      margin: 20px auto;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 30px;
+      border: none;
+      font-size: 1rem;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(5px);
+      transition: all 0.3s;
+    }
+    
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      background-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Players Grid */
+    .players-container {
+      width: 90%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .player-card {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.5s ease-out;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .player-card:hover {
+      transform: translateY(-5px);
+      background-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .player-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      color: white;
+    }
+    
+    .player-card p {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* Player Details Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 10;
+      overflow-y: auto;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-content {
+      background-color: #333;
+      margin: 50px auto;
+      padding: 30px;
+      width: 90%;
+      max-width: 800px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      animation: slideUp 0.4s ease-out;
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .close-modal:hover {
+      color: #D74356;
+      transform: rotate(90deg);
+    }
+    
+    .detail-title {
+      color: #D74356;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
+    .detail-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .detail-section h3 {
+      color: #D74356;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 5px;
+    }
+    
+    .detail-item {
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .detail-label {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+    
+    .detail-value {
+      color: white;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-all;
+    }
+    
+    .no-results {
+      text-align: center;
+      color: white;
+      margin-top: 30px;
+      font-size: 1.2rem;
+      display: none;
+    }
+    
+    /* Animation Keyframes */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    
+    @media (max-width: 600px) {
+      .players-container {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      .modal-content {
+        width: 95%;
+        padding: 20px;
+        margin: 30px auto;
+      }
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NavBar -->
+  <nav id="navbar">
+    <a href="https://getscarlet.vercel.app" target="_blank">Main</a>
+    <a href="https://getscarlet.vercel.app/scripts" target="_blank">Scripts</a>
+    <a href="https://getscarlet.vercel.app/help" target="_blank">Help</a>
+    <a href="https://getscarlet.vercel.app/analytics" target="_blank">Analytics</a>
+  </nav>
+
+  <div class="hamburger" onclick="toggleNavbar()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Main Content-->
+  <div class="main">
+    <h1>Scarlet Analytics</h1>
+    <p>User tracking information</p>
+  </div>
+
+  <div class="gray-background">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search by player name..." oninput="filterPlayers()">
+    </div>
+    
+    <div class="players-container" id="playersContainer">
+    </div>
+    
+    <div class="no-results" id="noResults">
+      No players found matching your search
+    </div>
+  </div>
+
+  <!-- Player Details Modal -->
+  <div class="modal" id="playerModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h2 class="detail-title" id="modalPlayerName">Player Name</h2>
+      
+      <div class="details-grid">
+        <div class="detail-section">
+          <h3>Player Info</h3>
+          <div class="detail-item">
+            <span class="detail-label">Username:</span>
+            <span class="detail-value" id="playerUsername">Username</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Display Name:</span>
+            <span class="detail-value" id="playerDisplayName">Display Name</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">User ID:</span>
+            <span class="detail-value" id="playerUserId">12345678</span>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Game Info</h3>
+          <div class="detail-item">
+            <span class="detail-label">Game:</span>
+            <span class="detail-value" id="gameName">Game Name</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Place ID:</span>
+            <span class="detail-value" id="placeId">12345678</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Job ID:</span>
+            <span class="detail-value" id="jobId">abc123def456</span>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>System Info</h3>
+          <div class="detail-item">
+            <span class="detail-label">Device:</span>
+            <span class="detail-value" id="deviceType">PC</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">IP Address:</span>
+            <span class="detail-value" id="ipAddress">123.456.789.0</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">HWID:</span>
+            <span class="detail-value" id="hwid">abcdef123456</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Injector:</span>
+            <span class="detail-value" id="injector">Synapse X</span>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Stats</h3>
+          <div class="detail-item">
+            <span class="detail-label">Time:</span>
+            <span class="detail-value" id="timestamp">2025-04-13 12:34:56</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Daily Count:</span>
+            <span class="detail-value" id="dailyCount">5</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Weekly Count:</span>
+            <span class="detail-value" id="weeklyCount">12</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Monthly Count:</span>
+            <span class="detail-value" id="monthlyCount">25</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total Count:</span>
+            <span class="detail-value" id="totalCount">76</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let playerData = [];
+
+    function initializePlayers() {
+      const container = document.getElementById('playersContainer');
+      container.innerHTML = '';
+
+      if (playerData.length === 0) {
+        document.getElementById('noResults').style.display = 'block';
+        return;
+      } else {
+        document.getElementById('noResults').style.display = 'none';
+      }
+
+      playerData.forEach((data, index) => {
+        const card = document.createElement('div');
+        card.className = 'player-card';
+        card.setAttribute('data-index', index);
+        card.onclick = function() { showPlayerDetails(index); };
+
+        const name = document.createElement('h3');
+        name.textContent = data.player.name;
+
+        const device = document.createElement('p');
+        device.textContent = data.system.device;
+
+        card.appendChild(name);
+        card.appendChild(device);
+        container.appendChild(card);
+      });
+    }
+
+    function fetchPlayerData() {
+      fetch('https://your-vercel-url.vercel.app', {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Accept": "application/json"
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok: " + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Получены данные:', data);
+          playerData = data;
+          initializePlayers();
+        })
+        .catch(error => {
+          console.error('Error fetching player data:', error);
+        });
+    }
+
+    function showPlayerDetails(index) {
+      const data = playerData[index];
+      document.getElementById('modalPlayerName').textContent = data.player.name;
+      document.getElementById('playerUsername').textContent = data.player.name;
+      document.getElementById('playerDisplayName').textContent = data.player.displayName;
+      document.getElementById('playerUserId').textContent = data.player.userId;
+    
+      document.getElementById('gameName').textContent = data.game.name;
+      document.getElementById('placeId').textContent = data.game.placeId;
+      document.getElementById('jobId').textContent = data.game.jobId;
+    
+      document.getElementById('deviceType').textContent = data.system.device;
+      document.getElementById('ipAddress').textContent = data.system.ip;
+      document.getElementById('hwid').textContent = data.system.hwid;
+      document.getElementById('injector').textContent = data.system.injector;
+      document.getElementById('timestamp').textContent = data.system.time;
+    
+      document.getElementById('dailyCount').textContent = data.stats.daily;
+      document.getElementById('weeklyCount').textContent = data.stats.weekly;
+      document.getElementById('monthlyCount').textContent = data.stats.monthly;
+      document.getElementById('totalCount').textContent = data.stats.total;
+    
+      document.getElementById('playerModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('playerModal').style.display = 'none';
+    }
+
+    function filterPlayers() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const container = document.getElementById('playersContainer');
+      const noResults = document.getElementById('noResults');
+      let hasVisibleCards = false;
+      
+      const cards = container.getElementsByClassName('player-card');
+      for (let i = 0; i < cards.length; i++) {
+        const index = cards[i].getAttribute('data-index');
+        const playerName = playerData[index].player.name.toLowerCase();
+        
+        if (playerName.includes(searchTerm)) {
+          cards[i].style.display = 'flex';
+          hasVisibleCards = true;
+        } else {
+          cards[i].style.display = 'none';
+        }
+      }
+      noResults.style.display = hasVisibleCards ? 'none' : 'block';
+    }
+
+    function toggleNavbar() {
+      document.getElementById('navbar').classList.toggle('open');
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('playerModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchPlayerData();
+    });
+  </script>
+</body>
+</html>
